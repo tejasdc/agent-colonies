@@ -1,0 +1,24 @@
+# Goal: Task Priority System
+
+## Desired End State
+
+Users can assign priority levels (high, medium, low) to tasks, see visual priority indicators at a glance, and filter their task list by priority to focus on what matters most.
+
+## Key Outcomes
+
+- Every task has a priority (default: medium)
+- Priority is visually obvious without clicking into a task
+- Users can change priority with minimal friction
+- Users can filter to see only high-priority items when focused
+
+## Non-Goals
+
+- No priority-based notifications or reminders
+- No automatic priority assignment based on due dates
+- No priority inheritance for subtasks
+
+## Context
+
+- This is a web app built with Next.js and a SQL database
+- There's an existing task list UI with card-based layout
+- The database already has a tasks table but no priority column

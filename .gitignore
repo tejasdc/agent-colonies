@@ -1,0 +1,18 @@
+# Project-specific colony data (lives in target projects, not here)
+agent-colony/
+
+# Temporary files
+tmp/
+*.tmp
+
+# OS files
+.DS_Store
+
+# Editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Claude Code local config
+.claude/

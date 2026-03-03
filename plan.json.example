@@ -1,0 +1,90 @@
+{
+  "project": "MyApp",
+  "branchName": "colony/task-priority",
+  "goalFile": "goal.md",
+  "tasks": [
+    {
+      "id": "T-001",
+      "title": "Add priority field to database",
+      "description": "Add a priority column to the tasks table with values high/medium/low and default medium. Create and run migration.",
+      "subtasks": [
+        { "description": "Create migration file with priority column", "done": false },
+        { "description": "Update schema types to include priority field", "done": false },
+        { "description": "Run migration and verify", "done": false }
+      ],
+      "votes": [
+        { "iteration": 1, "role": "implementer", "value": 1, "reason": "Foundation task - all UI work depends on this field existing" },
+        { "iteration": 2, "role": "implementer", "value": 1, "reason": "Confirmed: no priority field exists in current schema" }
+      ],
+      "comments": [],
+      "status": "done",
+      "createdBy": { "iteration": 1, "role": "implementer" },
+      "claimedBy": { "iteration": 1, "role": "implementer" },
+      "splitFrom": null
+    },
+    {
+      "id": "T-002",
+      "title": "Display priority badges on task cards",
+      "description": "Show colored priority indicator on each task card. Red for high, yellow for medium, gray for low. Must be visible without interaction.",
+      "subtasks": [
+        { "description": "Create PriorityBadge component", "done": false },
+        { "description": "Integrate badge into TaskCard component", "done": false },
+        { "description": "Add color mapping for priority levels", "done": false }
+      ],
+      "votes": [
+        { "iteration": 2, "role": "implementer", "value": 1, "reason": "Gap analysis confirms: priority field exists but no UI shows it" },
+        { "iteration": 5, "role": "reviewer", "value": 1, "reason": "Verified: badge component needed, existing Badge component can be reused with color variants" }
+      ],
+      "comments": [
+        { "iteration": 5, "role": "reviewer", "message": "Reuse the existing Badge component in components/ui/Badge.tsx - just add color prop variants" }
+      ],
+      "status": "in-progress",
+      "createdBy": { "iteration": 1, "role": "implementer" },
+      "claimedBy": { "iteration": 3, "role": "implementer" },
+      "splitFrom": null
+    },
+    {
+      "id": "T-003",
+      "title": "Add priority selector to task edit modal",
+      "description": "Add dropdown in task edit modal to change priority. Should show current priority as selected and save on change.",
+      "subtasks": [],
+      "votes": [
+        { "iteration": 2, "role": "implementer", "value": 1, "reason": "Users need a way to set priority, not just see it" }
+      ],
+      "comments": [],
+      "status": "open",
+      "createdBy": { "iteration": 1, "role": "implementer" },
+      "claimedBy": null,
+      "splitFrom": null
+    },
+    {
+      "id": "T-004",
+      "title": "Add drag-and-drop priority reordering",
+      "description": "Allow users to drag tasks between priority lanes to change priority.",
+      "subtasks": [],
+      "votes": [
+        { "iteration": 2, "role": "implementer", "value": -1, "reason": "Dropdown selector (T-003) is simpler and sufficient for MVP" },
+        { "iteration": 5, "role": "reviewer", "value": -1, "reason": "Over-engineered for current scope. T-003 covers the need." }
+      ],
+      "comments": [
+        { "iteration": 5, "role": "reviewer", "message": "This is a nice-to-have, not core to the goal. Focus on T-003 first." }
+      ],
+      "status": "open",
+      "createdBy": { "iteration": 2, "role": "implementer" },
+      "claimedBy": null,
+      "splitFrom": null
+    }
+  ],
+  "metadata": {
+    "createdAt": "2026-03-01T10:00:00Z",
+    "totalIterations": 6,
+    "iterationLog": [
+      { "iteration": 1, "role": "implementer", "taskWorked": "T-001", "contextCompacted": false },
+      { "iteration": 2, "role": "implementer", "taskWorked": "T-002", "contextCompacted": false },
+      { "iteration": 3, "role": "implementer", "taskWorked": "T-002", "contextCompacted": true },
+      { "iteration": 4, "role": "implementer", "taskWorked": "T-003", "contextCompacted": false },
+      { "iteration": 5, "role": "reviewer", "taskWorked": null, "contextCompacted": false },
+      { "iteration": 6, "role": "simplifier", "taskWorked": null, "contextCompacted": false }
+    ]
+  }
+}
