@@ -255,7 +255,7 @@ dispatch_agent() {
 
   case $AGENT in
     codex)
-      codex exec --dangerously-bypass-approvals-and-sandbox "Read and follow the instructions in $PROMPT_FILE" 2>&1 || true
+      codex exec --dangerously-bypass-approvals-and-sandbox "$PROMPT_FILE contains your complete assignment. Read it and start working immediately. Do not wait for further input." 2>&1 || true
       ;;
     claude)
       cat "$PROMPT_FILE" | claude --dangerously-skip-permissions --print 2>&1 || true
