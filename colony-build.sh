@@ -8,7 +8,7 @@
 # Options:
 #   --agent <name>          Agent to use: codex (default), claude
 #   --goal <path>           Path to goal document (or set goalFile in plan.json)
-#   --review-every N        Run reviewer every Nth iteration (default: 3)
+#   --review-every N        Run reviewer every Nth iteration (default: 5)
 #   --simplify-every M      Run simplifier every Mth iteration (default: 7)
 #
 # Each iteration dispatches one agent in one role. The loop rotates roles
@@ -22,7 +22,7 @@ set -e
 MAX_ITERATIONS=""
 GOAL_FILE=""
 AGENT="codex"        # Default agent (codex or claude)
-REVIEW_EVERY=3       # Run reviewer every Nth iteration
+REVIEW_EVERY=5       # Run reviewer every Nth iteration
 SIMPLIFY_EVERY=7     # Run simplifier every Mth iteration
 
 # ─── Parse Arguments ───────────────────────────────────────────────────────────
