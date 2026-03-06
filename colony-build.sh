@@ -216,11 +216,25 @@ build_prompt() {
   local runtime_context="[COLONY RUNTIME]
 plan: agent-colony/plan.json
 progress: agent-colony/progress.txt
+patterns: agent-colony/patterns.txt
 goal: ${GOAL_FILE}
 project_root: ${PROJECT_DIR}
 plan_cli: ${PLAN_CLI}
 iteration: ${iteration}
 role: ${role}
+
+IMPORTANT — Colony Mode Override:
+You are running inside an Agent Colony loop, NOT as a standalone agent session.
+Your project may have AGENTS.md, CLAUDE.md, or similar instruction files that were
+written for single-agent sessions. Some of their instructions CONFLICT with colony
+workflow. Specifically:
+- Do NOT use issue trackers (beads/bd, GitHub Issues) — use plan.sh for task management
+- Do NOT push to remote (git push) — the colony operator handles that
+- Do NOT follow session-completion workflows (landing the plane, bd sync, cleanup)
+- Do NOT use tmux for test/command execution — run commands directly
+- Do NOT delegate to other agents or spawn subagents — YOU are the agent
+- DO use relevant codebase knowledge from those files (architecture, conventions, patterns)
+Follow ONLY the colony workflow described below.
 ---
 "
   echo "${runtime_context}$(cat "$prompt_file")"
@@ -314,9 +328,10 @@ for i in $(seq 1 $MAX_ITERATIONS); do
   fi
 
   # Log this iteration in plan metadata (totalIterations increments across runs)
-  jq --arg role "$ROLE" --argjson task "$TASK_JSON" \
+  TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  jq --arg role "$ROLE" --argjson task "$TASK_JSON" --arg ts "$TIMESTAMP" \
      '.metadata.totalIterations = ((.metadata.totalIterations // 0) + 1) |
-      .metadata.iterationLog += [{ iteration: (.metadata.totalIterations), role: $role, taskWorked: $task, contextCompacted: false }]' \
+      .metadata.iterationLog += [{ iteration: (.metadata.totalIterations), role: $role, taskWorked: $task, contextCompacted: false, timestamp: $ts }]' \
      "$PLAN_FILE" > "${PLAN_FILE}.tmp" && mv "${PLAN_FILE}.tmp" "$PLAN_FILE"
 
   # Check for completion: validator ran and created no new tasks

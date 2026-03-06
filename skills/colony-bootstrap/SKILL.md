@@ -1,21 +1,17 @@
 ---
 name: colony-bootstrap
-description: Bootstrap an Agent Colony plan from the current project's goal or design document. Runs setup, analyzes the codebase, reads the goal, and creates a plan.json with initial tasks. Use when starting a new colony.
+description: Bootstrap, run, and monitor Agent Colonies. Use when starting a new colony, checking colony status, or managing a running colony.
 ---
 
-# Bootstrap Colony Plan
+# Agent Colony Management
 
-You are seeding the initial plan for an Agent Colony. This involves two phases:
-1. **Setup** (deterministic) — Run the setup script to create the `agent-colony/` directory and initialize project files
-2. **Plan creation** (AI-powered) — Read the goal document, analyze the codebase, and create `plan.json` with tasks
+This skill covers the full colony lifecycle: bootstrap, run, monitor, and manage.
 
-The plan you create is a **starting point, not a finished spec**. Colony agents will vote on tasks, add subtasks, split large tasks, and create new tasks as they discover gaps. Don't try to capture everything — capture the obvious top-level work.
-
-## Workflow
+## Bootstrap a New Colony
 
 ### Step 1: Find Source Directory & Run Setup
 
-First, find the agent-colonies source directory. Read the config file written by `install.sh`:
+Find the agent-colonies source directory:
 
 ```bash
 cat ~/.config/agent-colonies/source-dir
@@ -23,15 +19,21 @@ cat ~/.config/agent-colonies/source-dir
 
 This file contains the absolute path to the agent-colonies source (e.g., `/Users/alice/workspace/agent-colonies`). If the file doesn't exist, the user hasn't run `install.sh` yet — tell them to run it first from wherever they cloned the repo.
 
-Then run the setup script using that path:
+Store it for later use:
 
 ```bash
-$(cat ~/.config/agent-colonies/source-dir)/setup.sh
+COLONY_SRC=$(cat ~/.config/agent-colonies/source-dir)
+```
+
+Then run the setup script:
+
+```bash
+$COLONY_SRC/setup.sh
 ```
 
 This deterministically:
 - Creates `agent-colony/` directory
-- Initializes `progress.txt`
+- Initializes `progress.txt` and `patterns.txt`
 - Archives any previous run if the branch changed
 - Checks tool availability (claude, codex, jq)
 
@@ -144,16 +146,127 @@ Tasks created:
   T-002: <title>
   ...
 
-Next: Run colony-build.sh to start the colony loop.
-      (Full path: <source-dir>/colony-build.sh)
+Next steps:
+  Start the colony:  $COLONY_SRC/colony-build.sh 250
+  Check health:      COLONY_PLAN_FILE=agent-colony/plan.json $COLONY_SRC/plan.sh health
+  Task summary:      COLONY_PLAN_FILE=agent-colony/plan.json $COLONY_SRC/plan.sh summary
 ```
 
 Use the source directory from Step 1 for the full path.
 
-## Guidelines
+### Bootstrap Guidelines
 
 - **Aim for 3-8 tasks** for a typical feature. More than 10 suggests you're over-specifying.
 - **Tasks are starting points.** Agents will add, split, and modify them. Don't try to be comprehensive.
 - **Use the goal document's language** in task descriptions so agents can trace back to the source.
 - **If the goal doc is very detailed** (like a design doc with implementation plan), extract the key deliverables as tasks. Don't create a 1:1 mapping of every section.
 - **If the goal doc is minimal** (just a paragraph), create broader tasks and trust agents to break them down further.
+
+---
+
+## Run a Colony
+
+Start the colony loop from the project root (where `agent-colony/` lives):
+
+```bash
+$COLONY_SRC/colony-build.sh [options] [max_iterations]
+```
+
+**Options:**
+- `--agent <name>` — Agent to use: `codex` (default), `claude`
+- `--goal <path>` — Path to goal document (or set `goalFile` in plan.json)
+- `--review-every N` — Run reviewer every Nth iteration (default: 3)
+
+**Example:**
+```bash
+nohup $COLONY_SRC/colony-build.sh --goal docs/plans/my-feature.md 250 > colony-build.log 2>&1 &
+echo $!  # Save the PID
+```
+
+Use `nohup` + background so it survives terminal closure. Output goes to `colony-build.log`.
+
+---
+
+## Monitor a Running Colony
+
+### Quick Health Check
+
+```bash
+COLONY_PLAN_FILE=agent-colony/plan.json $COLONY_SRC/plan.sh health
+```
+
+This shows:
+- **Process status** — Is colony-build.sh running? PID, uptime
+- **Progress** — Iterations completed, task counts, completion %
+- **Velocity** — Tasks per 10 iterations, current task, longest stuck task
+- **Health metrics** — No-op rate, no-op streaks, null taskWorked breakdown
+- **Time metrics** — Avg time per iteration, last iteration age (requires timestamps)
+- **Role distribution** — Implementer/reviewer/simplifier/validator split
+- **Recent activity** — Last 5 iterations with role, task, and status
+- **Warnings** — WARN/CRITICAL alerts for no-op rates, stuck tasks, thrash
+
+### Task-Level Detail
+
+```bash
+COLONY_PLAN_FILE=agent-colony/plan.json $COLONY_SRC/plan.sh summary
+```
+
+Shows all tasks with status, votes, and descriptions.
+
+### Raw Statistics
+
+```bash
+COLONY_PLAN_FILE=agent-colony/plan.json $COLONY_SRC/plan.sh stats
+```
+
+### View a Specific Task
+
+```bash
+COLONY_PLAN_FILE=agent-colony/plan.json $COLONY_SRC/plan.sh show T-007
+```
+
+### Tail the Colony Log
+
+```bash
+tail -f colony-build.log
+```
+
+---
+
+## Manage a Running Colony
+
+### Kill the Colony
+
+```bash
+kill $(pgrep -f colony-build.sh)
+```
+
+### Restart with Updated Prompts
+
+If you've updated prompts, colony-build.sh, or plan.sh, the running colony won't pick up changes. Kill and restart:
+
+```bash
+kill $(pgrep -f colony-build.sh)
+nohup $COLONY_SRC/colony-build.sh --goal docs/plans/my-feature.md 250 > colony-build.log 2>&1 &
+```
+
+### Fresh Start (Archive Old Run)
+
+```bash
+$COLONY_SRC/setup.sh --fresh
+```
+
+This archives the current plan.json and progress.txt, then reinitializes for a clean run.
+
+---
+
+## Key Files
+
+| File | Location | Purpose |
+|------|----------|---------|
+| `plan.json` | `agent-colony/plan.json` | Task plan — tasks, votes, iteration log |
+| `progress.txt` | `agent-colony/progress.txt` | Iteration log — what each agent did (skim last 10-15 entries) |
+| `patterns.txt` | `agent-colony/patterns.txt` | Curated codebase conventions discovered by agents |
+| `colony-build.log` | Project root | Full Codex output per iteration |
+| `plan.sh` | `$COLONY_SRC/plan.sh` | CLI for querying/updating the plan |
+| `colony-build.sh` | `$COLONY_SRC/colony-build.sh` | Main colony loop script |

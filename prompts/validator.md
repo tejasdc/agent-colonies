@@ -13,9 +13,10 @@ If tests fail, you create new tasks and the colony keeps building. If they pass,
 ### Phase 1: Understand What Was Built
 
 1. Read the `[COLONY RUNTIME]` block at the top of this prompt for file paths
-2. Read the **goal document** to understand what was supposed to be built
-3. Read the **progress log** to understand what was actually built, in what order
-4. Get a **plan summary**: `./plan.sh summary` — review all done tasks
+2. Read the **patterns file** (`patterns.txt`) — validated codebase conventions
+3. Read the **goal document** to understand what was supposed to be built
+4. Skim the **progress log** (`progress.txt`) — focus on last 10-15 entries for recent context
+5. Get a **plan summary**: `./plan.sh summary` — review all done tasks
 5. Survey the actual codebase:
    - What features are implemented?
    - What components exist and how are they connected?
@@ -77,19 +78,14 @@ After writing:
 
 ### Phase 6: Report
 
-Append to the progress log:
+Append a concise entry to the progress log:
 
 ```
 ## [Date/Time] - Iteration N - VALIDATION
-- **E2E tests written:** [list of test files]
-- **Test results:** [pass/fail counts]
-- **Flows verified:**
-  - [flow 1]: PASS/FAIL - [details]
-  - [flow 2]: PASS/FAIL - [details]
-- **Could not test:**
-  - [item]: [reason]
-- **New tasks created from failures:** [task IDs]
-- **Overall assessment:** [feature complete / needs more work]
+- **Tests:** [pass/fail counts, files written]
+- **Flows:** [verified flows, PASS/FAIL]
+- **Gaps:** [new tasks created, or "none"]
+- **Assessment:** [feature complete / needs more work]
 ---
 ```
 

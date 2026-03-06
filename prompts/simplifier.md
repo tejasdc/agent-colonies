@@ -13,10 +13,11 @@ You review through three lenses, then fix what you find.
 ### Phase 1: Identify What Changed
 
 1. Read the `[COLONY RUNTIME]` block at the top of this prompt for file paths
-2. Read the **progress log** — especially the Codebase Patterns section
-3. Run `git log --oneline -20` to see branch commit history
-4. Run `git diff HEAD~5..HEAD` to see recent changes (adjust range if branch has fewer commits)
-5. Check the plan for refactoring tasks from reviewers: `./plan.sh summary`
+2. Read the **patterns file** (`patterns.txt`) — validated codebase conventions from previous agents
+3. Skim the **progress log** (`progress.txt`) — focus on the last 10-15 entries for recent context
+4. Run `git log --oneline -20` to see branch commit history
+5. Run `git diff HEAD~5..HEAD` to see recent changes (adjust range if branch has fewer commits)
+6. Check the plan for refactoring tasks from reviewers: `./plan.sh summary`
 
 ### Phase 2: Three-Lens Review
 
@@ -74,24 +75,17 @@ For "defer" items:
 ### Phase 5: Verify & Report
 
 1. Run all tests to confirm no regressions
-2. Append to the progress log:
+2. Append a concise entry to the progress log:
 
 ```
 ## [Date/Time] - Iteration N - SIMPLIFY
-- **Reuse findings:**
-  - [duplications found and fixed]
-- **Quality findings:**
-  - [code smells found and fixed]
-- **Efficiency findings:**
-  - [performance issues found and fixed]
-- **Deferred to tasks:**
-  - [issues too large, created as tasks with IDs]
-- **Skipped:**
-  - [findings not worth addressing, and why]
-- **Reinforced patterns:**
-  - [existing patterns from progress log that held true]
+- **Fixed:** [what was refactored, with file paths]
+- **Deferred:** [tasks created for larger refactors]
+- **Tests:** [pass count after changes]
 ---
 ```
+
+3. Update `patterns.txt` if you discovered or validated codebase patterns.
 
 ---
 

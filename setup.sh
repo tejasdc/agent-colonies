@@ -5,7 +5,7 @@
 # Usage:
 #   <agent-colonies-dir>/setup.sh [--fresh]
 #
-# Creates agent-colony/ with project-specific files only (plan.json, progress.txt).
+# Creates agent-colony/ with project-specific files only (plan.json, progress.txt, patterns.txt).
 # Shared files (prompts, scripts, docs) stay in the agent-colonies source.
 #
 # Options:
@@ -18,7 +18,7 @@
 #      - Same branch → resume (no archive, no reset)
 #      - --fresh flag → always archive and reset
 #   3. Creates agent-colony/ if it doesn't exist
-#   4. Initializes progress.txt if it doesn't exist
+#   4. Initializes progress.txt and patterns.txt if they don't exist
 #   5. Reports current state
 
 set -e
@@ -106,6 +106,7 @@ if [ -d "$TARGET_DIR" ] && [ -f "$TARGET_DIR/plan.json" ]; then
     mkdir -p "$ARCHIVE_FOLDER"
     cp "$TARGET_DIR/plan.json" "$ARCHIVE_FOLDER/"
     [ -f "$TARGET_DIR/progress.txt" ] && cp "$TARGET_DIR/progress.txt" "$ARCHIVE_FOLDER/"
+    [ -f "$TARGET_DIR/patterns.txt" ] && cp "$TARGET_DIR/patterns.txt" "$ARCHIVE_FOLDER/"
     echo "  Archived to: $ARCHIVE_FOLDER"
 
     # Reset for new run
@@ -113,6 +114,10 @@ if [ -d "$TARGET_DIR" ] && [ -f "$TARGET_DIR/plan.json" ]; then
     echo "# Agent Colony Progress Log" > "$TARGET_DIR/progress.txt"
     echo "Started: $(date)" >> "$TARGET_DIR/progress.txt"
     echo "---" >> "$TARGET_DIR/progress.txt"
+    echo "# Codebase Patterns" > "$TARGET_DIR/patterns.txt"
+    echo "# Validated conventions discovered during this colony run." >> "$TARGET_DIR/patterns.txt"
+    echo "# Keep each pattern to one line. Remove outdated entries." >> "$TARGET_DIR/patterns.txt"
+    echo "---" >> "$TARGET_DIR/patterns.txt"
     rm -f "$LAST_BRANCH_FILE"
     echo "  Reset for fresh start"
   else
@@ -133,6 +138,17 @@ if [ ! -f "$TARGET_DIR/progress.txt" ]; then
   echo "Created progress.txt"
 else
   echo "progress.txt exists (preserved)"
+fi
+
+# ─── Initialize patterns file (skip if exists) ──────────────────────────────
+if [ ! -f "$TARGET_DIR/patterns.txt" ]; then
+  echo "# Codebase Patterns" > "$TARGET_DIR/patterns.txt"
+  echo "# Validated conventions discovered during this colony run." >> "$TARGET_DIR/patterns.txt"
+  echo "# Keep each pattern to one line. Remove outdated entries." >> "$TARGET_DIR/patterns.txt"
+  echo "---" >> "$TARGET_DIR/patterns.txt"
+  echo "Created patterns.txt"
+else
+  echo "patterns.txt exists (preserved)"
 fi
 
 # ─── Report plan.json status ─────────────────────────────────────────────────
