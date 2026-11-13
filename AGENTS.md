@@ -107,6 +107,7 @@ The main loop handles:
 - Role dispatch (`get_role()` function)
 - Prompt building (`build_prompt()` function)
 - Agent dispatch (`dispatch_agent()` function) — currently uses the same invocation for all roles (no read-only sandbox for reviewer, despite the design doc suggesting it)
+- Codex project trust compatibility and current CLI behavior are documented in `README.md` under “Run the colony loop”.
 - Iteration logging to `plan.json` metadata
 - Completion detection (validator + no new tasks)
 - Consecutive validation safety (forces implementer after 3 consecutive validator runs)

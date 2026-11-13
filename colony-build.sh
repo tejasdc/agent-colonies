@@ -20,6 +20,7 @@ set -e
 
 # ─── Defaults ──────────────────────────────────────────────────────────────────
 MAX_ITERATIONS=""
+CODEX_TRUST_ARGS=()
 GOAL_FILE=""
 AGENT="codex"        # Default agent (codex or claude)
 REVIEW_EVERY=5       # Run reviewer every Nth iteration
@@ -80,6 +81,14 @@ case $AGENT in
       echo "Error: codex CLI not found. Install: npm install -g @openai/codex"
       echo "Or use --agent claude to use Claude Code instead."
       exit 1
+    fi
+    if ! CODEX_EXEC_HELP=$(codex exec --help 2>&1); then
+      echo "Error: could not inspect 'codex exec --help'; refusing to start the Codex colony."
+      echo "$CODEX_EXEC_HELP"
+      exit 1
+    fi
+    if printf '%s\n' "$CODEX_EXEC_HELP" | grep -Eq '^[[:space:]]+--trust([[:space:]]|$)'; then
+      CODEX_TRUST_ARGS=(--trust)
     fi
     ;;
   claude)
@@ -255,7 +264,7 @@ dispatch_agent() {
 
   case $AGENT in
     codex)
-      codex exec --dangerously-bypass-approvals-and-sandbox "$PROMPT_FILE contains your complete assignment. Read it and start working immediately. Do not wait for further input." 2>&1 || true
+      codex exec "${CODEX_TRUST_ARGS[@]}" --dangerously-bypass-approvals-and-sandbox "$PROMPT_FILE contains your complete assignment. Read it and start working immediately. Do not wait for further input." 2>&1 || true
       ;;
     claude)
       cat "$PROMPT_FILE" | claude --dangerously-skip-permissions --print 2>&1 || true

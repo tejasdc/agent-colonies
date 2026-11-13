@@ -120,6 +120,16 @@ The loop runs until either:
 - The validator confirms all tasks are done and e2e tests pass
 - Max iterations reached (default 100)
 
+For Codex, the launcher checks `codex exec --help` before starting the loop. When the selected
+Codex executable supports `--trust` (introduced in 0.169), the launcher passes it so project
+configuration and MCP servers remain available for the target project. Older clients such as
+0.166 do not receive the unsupported flag. If help inspection fails, the launcher stops before
+changing colony run state. Codex applies trust to the target project where `colony-build.sh` is
+run; the shared Agent Colonies source checkout is only used to read prompts. The trust choice is
+saved for future runs, including ephemeral runs, while Codex's explicit untrusted-project setting
+still takes precedence. The existing full-access execution mode and operator-selected model remain
+unchanged.
+
 Safety mechanisms:
 - If the validator runs 3 times consecutively without completion, it forces an implementer iteration to break the loop
 - Previous runs are automatically archived when you switch git branches
